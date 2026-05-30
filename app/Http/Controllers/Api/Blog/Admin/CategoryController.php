@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BlogCategory;
 use Illuminate\Support\Str;
+use App\Http\Requests\BlogCategoryUpdateRequest;
+use App\Http\Requests\BlogCategoryCreateRequest;
+
 
 class CategoryController extends Controller
 {
@@ -22,19 +25,23 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BlogCategoryCreateRequest $request)
     {
         //dd(__METHOD__);
-        $data = $request->all();
+        $data = $request->input();
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
         }
 
-        $item = BlogCategory::create($data);
+        $item = (new BlogCategory())->create($data);
         if ($item) {
-            return ['success' => 'Успішно створено'];
+            return [
+                'success' => true,
+                'message' => 'Успішно збережено',
+                'data' => $item
+            ];
         } else {
-            return ['msg' => 'Помилка створення'];
+            return ['message' => 'Помилка збереження'];
         }
     }
 
@@ -49,7 +56,7 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(BlogCategoryUpdateRequest $request, $id)
     {
         //dd(__METHOD__);
         $item = BlogCategory::find($id);
