@@ -35,9 +35,6 @@ class CategoryController extends Controller
     {
         //dd(__METHOD__);
         $data = $request->input();
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
-        }
 
         $item = (new BlogCategory())->create($data);
         if ($item) {
@@ -72,9 +69,6 @@ class CategoryController extends Controller
                 ->withInput();
         }
         $data = $request->all();
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
-        }
 
         $result = $item->update($data);
         if ($result) {
