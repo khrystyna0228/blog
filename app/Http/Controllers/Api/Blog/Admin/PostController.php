@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Api\Blog\Admin;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\BlogPost;
 use App\Http\Requests\BlogPostCreateRequest;
+use App\Jobs\BlogPostAfterCreateJob;
+use App\Jobs\BlogPostAfterDeleteJob;
 
 class PostController extends BaseController
 {
+    use DispatchesJobs;
     /**
      * Display a listing of the resource.
      */
@@ -37,9 +41,11 @@ class PostController extends BaseController
         $item = (new BlogPost())->create($data);
 
         if ($item) {
+            $job = new BlogPostAfterCreateJob($item); // ← до return
+            $this->dispatch($job);
             return [
                 'success' => 'Успішно збережено',
-                'data' => $item
+                'data' => $item,
             ];
         } else {
             return ['msg' => 'Помилка збереження'];
@@ -87,9 +93,11 @@ class PostController extends BaseController
         $result = BlogPost::destroy($id);
 
         if ($result) {
+            BlogPostAfterDeleteJob::dispatch($id)->delay(20);
             return ['success' => true,
                 'message' => 'Успішно видалено',
                 'id' => $id
+
             ];
         } else {
             return ['success' => false,
