@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use Carbon\Carbon;
+use App\Jobs\ProcessVideoJob;
+use App\Jobs\GenerateCatalog\GenerateCatalogMainJob;
 
 class DiggingDeeperController extends Controller
 {
@@ -96,5 +98,15 @@ class DiggingDeeperController extends Controller
         $sortedDescCollection = $collection->sortByDesc('item_id');
 
         //dd(compact('sortedSimpleCollection', 'sortedAscCollection', 'sortedDescCollection'));
+    }
+
+    public function processVideo()
+    {
+        ProcessVideoJob::dispatch();
+    }
+
+    public function prepareCatalog()
+    {
+        GenerateCatalogMainJob::dispatch();
     }
 }

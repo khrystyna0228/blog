@@ -20,8 +20,8 @@ class ProcessVideoJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle()
     {
-        //
+        \Log::info('ProcessVideoJob done');
     }
 }
